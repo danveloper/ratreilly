@@ -1,34 +1,23 @@
 import ratpack.error.internal.DefaultDevelopmentErrorHandler
 
 
+import static groovy.json.JsonOutput.toJson
 import static ratpack.groovy.Groovy.ratpack
-
-class Transactions {
-  void beginTransaction() {
-    println "Beginning Transaction"
-  }
-  void endTransaction() {
-    println "Ending Transaction"
-  }
-}
 
 ratpack {
   bindings {
-    bindInstance(new Transactions())
     bindInstance(new DefaultDevelopmentErrorHandler())
   }
   handlers {
-    handler { Transactions tx ->
-      tx.beginTransaction()
-      byMethod {
-        get {
-          response.send "Default GET handler"
+    handler {
+      byContent {
+        json {
+          render(toJson([msg: "You wanted JSON"]))
         }
-        post {
-          response.send "You POSTED to me!"
+        type("application/vnd.foo.app+json") {
+          render(toJson([msg: "You wanted hypermedia!!"]))
         }
       }
-      tx.endTransaction()
     }
   }
 }

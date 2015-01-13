@@ -17,4 +17,9 @@ repositories {
   maven { url "http://clinker.netty.io/nexus/content/repositories/snapshots" }
 }
 
+dependencies {
+  compile ratpack.dependency("guice")
+  compile ratpack.dependency("jackson")
+}
+
 mainClassName = "oreilly.JavaMain"

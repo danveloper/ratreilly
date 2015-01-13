@@ -1,42 +1,43 @@
 package oreilly;
 
 import ratpack.error.internal.DefaultDevelopmentErrorHandler;
+import ratpack.guice.Guice;
+import ratpack.jackson.JacksonModule;
 import ratpack.server.RatpackServer;
 import ratpack.server.ServerConfig;
 
+import java.util.HashMap;
+
+import static ratpack.jackson.Jackson.json;
+
 public class JavaMain {
-
-  static class Transactions {
-    void beginTransaction() {
-      System.out.println("Transaction initiated!");
-    }
-
-    void endTransaction() {
-      System.out.println("Transaction ended!");
-    }
-  }
 
   public static void main(String[] args) throws Exception {
     RatpackServer.start(spec -> spec
             .config(ServerConfig.findBaseDirProps("ratpack.properties").development(true))
             .registry(r -> {
-              r.add(new Transactions());
               r.add(new DefaultDevelopmentErrorHandler());
             })
-            .handlers(chain -> chain
-                    .handler(ctx -> {
-                      Transactions tx = ctx.get(Transactions.class);
-                      tx.beginTransaction();
-                      ctx.byMethod(m -> m
-                              .get(() ->
-                                      ctx.getResponse().send("Default GET handler")
-                              )
-                              .post(() ->
-                                      ctx.getResponse().send("You POSTed to me!")
-                              )
-                      );
-                      tx.endTransaction();
-                    })
+            .handler(r ->
+                    Guice.builder(r)
+                        .bindings(bindings -> {
+                          bindings.add(new JacksonModule());
+                        }).build(chain -> chain
+                            .handler(ctx ->
+                                    ctx.byContent(c -> c
+                                            .json(() ->
+                                                    ctx.render(json(new HashMap<String, String>() {{
+                                                      put("msg", "You wanted JSON!");
+                                                    }}))
+                                            )
+                                            .type("application/vnd.foo.app+json", () ->
+                                                    ctx.render(json(new HashMap<String, String>() {{
+                                                      put("msg", "You wanted HYPERMEDIA!!");
+                                                    }}))
+                                            )
+                                    )
+                            )
+                    )
             )
     );
   }
