@@ -1,0 +1,20 @@
+buildscript {
+  repositories {
+    jcenter()
+    maven { url "http://oss.jfrog.org/oss-snapshot-local" }
+    maven { url "http://clinker.netty.io/nexus/content/repositories/snapshots" }
+  }
+  dependencies {
+    classpath 'io.ratpack:ratpack-gradle:0.9.13-SNAPSHOT'
+  }
+}
+
+apply plugin: 'io.ratpack.ratpack-groovy'
+
+repositories {
+  jcenter()
+  maven { url "http://oss.jfrog.org/oss-snapshot-local" }
+  maven { url "http://clinker.netty.io/nexus/content/repositories/snapshots" }
+}
+
+mainClassName = "oreilly.Main"
