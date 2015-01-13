@@ -8,17 +8,12 @@ public class JavaMain {
 
   public static void main(String[] args) throws Exception {
     RatpackServer.start(spec -> spec
-            .config(ServerConfig.noBaseDir().development(true))
+            .config(ServerConfig.findBaseDirProps("ratpack.properties").development(true))
             .registry(r -> r.add(new DefaultDevelopmentErrorHandler()))
             .handlers(chain -> chain
-                .get(ctx ->
-                    ctx.getResponse().send("I'm in the default route!"))
-
-                .get("route1", (ctx) ->
+                .get("/route1", ctx ->
                     ctx.getResponse().send("I'm in route1!"))
-
-                .get("route2/:param", (ctx) ->
-                    ctx.getResponse().send(String.format("received param: %s", ctx.getPathTokens().get("param"))))
+                .assets("public", "index.html")
     )
     );
   }
